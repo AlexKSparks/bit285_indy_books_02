@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using IndyBooks.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Bogus;
 
 namespace IndyBooks
 {
@@ -31,14 +32,14 @@ namespace IndyBooks
             //Writers
             var testWriters = new Faker<Writer>()
                 .RuleFor(w => w.Name, f => authors[authorIndex++]);
-            var writers = testWriters.Generate(5); // TODO: (2) create a collection of 45 writers
+            var writers = testWriters.Generate(45); // TODO: (2) create a collection of 45 writers
             //Books
             var testBooks = new Faker<Book>()
                 .RuleFor(b => b.Title, t => t.PickRandom(titles))
                 .RuleFor(b => b.SKU, n => n.Random.Replace("IB****-##"))
                 .RuleFor(b => b.Price, f => f.Random.Decimal(9.99M, 149.99M))
                 .RuleFor(b => b.Author, f => f.PickRandom(writers));
-            var books = testBooks.Generate(10); // TODO: (3) create a collection of 100 books
+            var books = testBooks.Generate(100); // TODO: (3) create a collection of 100 books
 
             //TODO : (4) Add the writers collection to the 
             await context.Books.AddRangeAsync(books);

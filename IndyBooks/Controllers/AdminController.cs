@@ -29,23 +29,31 @@ namespace IndyBooks.Controllers
             if (search.Title != null)
             {
                 foundBooks = foundBooks
+                                .Include(b => b.Author)
                              .Where(b => b.Title.Contains(search.Title))
                              .OrderBy(b => b.Title)
                              ;
             }
-
+            //full Collection search
+            if (search.Title == null && search.AuthorLastName == null && search.MaxPrice == 0 && search.MinPrice == 0)
+            {
+                foundBooks = foundBooks
+                            .Include(b => b.Author);
+            }
             //Author's Last Name Search
             if (search.AuthorLastName != null)
             {
                 //TODO:Update to use the Name property of the Book's Author entity
                 foundBooks = foundBooks
-                             .Where(b => b.Author.EndsWith(search.AuthorLastName, StringComparison.CurrentCulture))
+                              .Include(b => b.Author)
+                             .Where(b => b.Author.Name.EndsWith(search.AuthorLastName, StringComparison.CurrentCulture))
                              ;
             }
             //Priced Between Search (min and max price entered)
             if (search.MinPrice > 0 && search.MaxPrice > 0)
             {
                 foundBooks = foundBooks
+                               .Include(b => b.Author)              
                              .Where(b => b.Price >= search.MinPrice && b.Price <= search.MaxPrice)
                              .OrderByDescending(b => b.Price)
                              ;
@@ -55,9 +63,12 @@ namespace IndyBooks.Controllers
             {
                 decimal max = _db.Books.Max(b => b.Price);
                 foundBooks = foundBooks
+                    .Include(b => b.Author)
+                                .Where(b => b.Price == max);
                              ;
 
             }
+
             //Composite Search Results
             return View("SearchResults", foundBooks);
         }
